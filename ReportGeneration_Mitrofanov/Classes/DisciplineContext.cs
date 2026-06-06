@@ -11,23 +11,23 @@ namespace ReportGeneration_Mitrofanov.Classes
 {
     public class DisciplineContext : Discipline
     {
-        public DisciplineContext(int Id, string Name, int IdGroup) : base(Id, Name, IdGroup) { }
+        public DisciplineContext(int Id, string Name, int IdGroup) : base(Id, Name, IdGroup)
+        {
+        }
 
         public static List<DisciplineContext> AllDisciplines()
         {
             List<DisciplineContext> allDisciplines = new List<DisciplineContext>();
             MySqlConnection connection = Connection.OpenConnection();
-            MySqlDataReader reader = Connection.Query("SELECT * FROM discipline ORDER BY Name;", connection);
-
-            while (reader.Read())
+            MySqlDataReader BDDisciplines = Connection.Query("SELECT * FROM discipline ORDER BY Name;", connection);
+            while (BDDisciplines.Read())
             {
                 allDisciplines.Add(new DisciplineContext(
-                    reader.GetInt32(0),
-                    reader.GetString(1),
-                    reader.GetInt32(2)
+                    BDDisciplines.GetInt32(0),
+                    BDDisciplines.GetString(1),
+                    BDDisciplines.GetInt32(2)
                 ));
             }
-
             Connection.CloseConnection(connection);
             return allDisciplines;
         }

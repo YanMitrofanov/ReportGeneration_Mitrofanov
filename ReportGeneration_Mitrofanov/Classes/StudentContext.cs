@@ -11,27 +11,27 @@ namespace ReportGeneration_Mitrofanov.Classes
 {
     public class StudentContext : Student
     {
-        public StudentContext(int Id, string Firstname, string Lastname, int IdGroup, bool Expelled, DateTime DateTimeExpelled)
-                   : base(Id, Firstname, Lastname, IdGroup, Expelled, DateTimeExpelled) { }
+        public StudentContext(int Id, string Firstname, string Lastname, int IdGroup, bool Expelled, DateTime DateExpelled)
+            : base(Id, Firstname, Lastname, IdGroup, Expelled, DateExpelled)
+        {
+        }
 
         public static List<StudentContext> AllStudents()
         {
             List<StudentContext> allStudents = new List<StudentContext>();
             MySqlConnection connection = Connection.OpenConnection();
-            MySqlDataReader reader = Connection.Query("SELECT * FROM student ORDER BY Lastname;", connection);
-
-            while (reader.Read())
+            MySqlDataReader BDStudents = Connection.Query("SELECT * FROM student ORDER BY Lastname;", connection);
+            while (BDStudents.Read())
             {
                 allStudents.Add(new StudentContext(
-                    reader.GetInt32(0),
-                    reader.GetString(1),
-                    reader.GetString(2),
-                    reader.GetInt32(3),
-                    reader.GetBoolean(4),
-                    reader.IsDBNull(5) ? DateTime.Now : reader.GetDateTime(5)
+                    BDStudents.GetInt32(0),
+                    BDStudents.GetString(1),
+                    BDStudents.GetString(2),
+                    BDStudents.GetInt32(3),
+                    BDStudents.GetBoolean(4),
+                    BDStudents.IsDBNull(5) ? DateTime.Now : BDStudents.GetDateTime(5)
                 ));
             }
-
             Connection.CloseConnection(connection);
             return allStudents;
         }
