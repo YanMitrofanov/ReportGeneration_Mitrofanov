@@ -26,6 +26,7 @@ namespace ReportGeneration_Mitrofanov.Items
         public int IdGroup { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
+        public bool Expelled { get; set; }
         public Student(int id, string firstname, string lastname, int idGroup, bool expelled)
         {
             InitializeComponent();
@@ -33,30 +34,58 @@ namespace ReportGeneration_Mitrofanov.Items
             Firstname = firstname;
             Lastname = lastname;
             IdGroup = idGroup;
+            Expelled = expelled;
 
             TBFio.Text = $"{lastname} {firstname}";
+
+
+            var group = GroupContext.AllGroups().FirstOrDefault(g => g.Id == idGroup);
+            if (group != null)
+            {
+                var groupTextBox = FindName("TBGroup") as TextBox;
+                if (groupTextBox != null)
+                    groupTextBox.Text = group.Name;
+            }
+
             CBExemplel.IsChecked = expelled;
 
-            LoadStudentProgress();
+            CalculateProgress();
         }
-        private void LoadStudentProgress()
+
+        private void CalculateProgress()
         {
-            
             var allEvaluations = EvaluationContext.AllEvaluations();
             var allWorks = WorkContext.AllWorks();
 
             var studentEvals = allEvaluations.Where(e => e.IdStudent == StudentId).ToList();
-            var totalWorks = allWorks.Count();
+
+            var allDisciplines = DisciplineContext.AllDisciplines();
+            var groupDisciplineIds = allDisciplines.Where(d => d.IdGroup == IdGroup).Select(d => d.Id);
+            var groupWorks = allWorks.Where(w => groupDisciplineIds.Contains(w.IdDiscipline)).ToList();
+
+            int totalWorks = groupWorks.Count;
 
             if (totalWorks > 0)
             {
-                double completed = studentEvals.Count(e => e.Value == "зачет" || e.Value == "отлично" || e.Value == "хорошо" || e.Value == "удовлетворительно");
-                doneWorks.Value = (completed / totalWorks) * 100;
-            }
+                int completedWorks = studentEvals.Count(e =>
+                    e.Value == "зачет" ||
+                    e.Value == "отлично" ||
+                    e.Value == "хорошо" ||
+                    e.Value == "удовлетворительно" ||
+                    e.Value == "5" ||
+                    e.Value == "4" ||
+                    e.Value == "3"
+                );
 
-            
-            int latenessCount = studentEvals.Count(e => int.TryParse(e.Lateness, out int lateness) && lateness > 0);
-            missedCount.Value = latenessCount;
+                double completedPercent = (double)completedWorks / totalWorks * 100;
+                doneWorks.Value = completedPercent;
+
+                int latenessCount = studentEvals.Count(e =>
+                    int.TryParse(e.Lateness, out int lateness) && lateness > 0
+                );
+
+                missedCount.Value = latenessCount > 10 ? 10 : latenessCount;
+            }
         }
     }
 }
