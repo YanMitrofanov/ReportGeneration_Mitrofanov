@@ -128,7 +128,7 @@ namespace ReportGeneration_Mitrofanov.Pages
             if (CBGroups.SelectedIndex >= 0 && CBGroups.SelectedIndex < AllGroups.Count)
             {
                 var selectedGroup = AllGroups[CBGroups.SelectedIndex];
-                Report.GenerateGroupReport(selectedGroup.Id, this);
+                Report.Group(selectedGroup.Id, this);
             }
             else
             {
