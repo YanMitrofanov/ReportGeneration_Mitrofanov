@@ -40,6 +40,7 @@ namespace ReportGeneration_Mitrofanov.Pages
             CreateGroupUI();
             CreateStudents();
         }
+
         public void CreateGroupUI()
         {
             foreach (GroupContext Group in AllGroups)
@@ -119,6 +120,20 @@ namespace ReportGeneration_Mitrofanov.Pages
                     student.IdGroup,
                     student.Expelled
                 ));
+            }
+        }
+        /// <summary> Генерация Excel документа </summary>
+        public void ReportGeneration(object sender, RoutedEventArgs e)
+        {
+            if (CBGroups.SelectedIndex >= 0 && CBGroups.SelectedIndex < AllGroups.Count)
+            {
+                var selectedGroup = AllGroups[CBGroups.SelectedIndex];
+                Report.GenerateGroupReport(selectedGroup.Id, this);
+            }
+            else
+            {
+                MessageBox.Show("Выберите группу для формирования отчёта!", "Внимание",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }
